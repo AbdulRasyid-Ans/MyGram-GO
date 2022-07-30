@@ -1,0 +1,802 @@
+swagger: "2.0"
+info:
+  description: "Aplikasi ini digunakan untuk menyimpan foto maupun membuat comment untuk foto orang lain."
+  version: "1.0"
+  title: "MyGram"
+  contact:
+    email: "abdul.rasyid.anshori@gmail.com"
+host: "localhost"
+basePath: "/api/v1.0"
+
+
+
+tags:
+- name: "user"
+  description: "digunakan untuk Register, Logim, Update, dan Delete User"
+- name: "photo"
+  description: "digunakan untuk CRUD data Photo"
+- name: "comment"
+  description: "digunakan untuk CRUD data Comment"
+- name: "social media"
+  description: "digunakan untuk CRUD data Social Media"
+schemes:
+- "https"
+- "http"
+paths:
+  /users/register:
+    post:
+      tags:
+      - "user"
+      summary: "Register User"
+      description: "Endpoint ini digunakan untuk registrasi user baru."
+      operationId: "registerUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Register user object"
+        required: true
+        schema:
+          $ref: "#/definitions/UserRegister"
+      responses:
+        "201":
+          description: "user registered"
+          schema:
+            $ref: "#/definitions/UserRegisterResponse"
+  /users/login:
+    post:
+      tags:
+      - "user"
+      summary: "Login User"
+      description: "Endpoint ini digunakan untuk login user."
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/UserLogin"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          schema: 
+            $ref: "#/definitions/TokenResponse"
+  /users:
+    put:
+      tags:
+      - "user"
+      summary: "Update User"
+      description: "Endpoint ini digunakan untuk update data user."
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/UserUpdate"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          schema: 
+            $ref: "#/definitions/UserUpdateResponse"
+      security:
+      - Bearer: []
+    delete:
+      tags:
+      - "user"
+      summary: "Delete User"
+      description: "Endpoint ini digunakan untuk delete user."
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your account has been successfully deleted"
+      security:
+      - Bearer: []
+
+  /photos:
+    post:
+      tags:
+      - "photo"
+      summary: "Create Photo"
+      description: "Endpoint ini digunakan untuk upload photo."
+      operationId: "createPhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/PhotoCreateAndUpdate"
+          required: true
+      responses:
+        "201":
+          description: "Created"
+          schema: 
+            $ref: "#/definitions/PhotoCreateResponse"
+      security:
+      - Bearer: []
+    get:
+      tags:
+      - "photo"
+      summary: "Get Photo List"
+      description: "Endpoint ini digunakan untuk mendapatkan list photo."
+      operationId: "listPhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/PhotoListResponse"
+      security:
+      - Bearer: []
+  /photos/{photoId}:
+    put:
+      tags:
+      - "photo"
+      summary: "Update Photo"
+      description: "Endpoint ini digunakan untuk update photo."
+      operationId: "updatePhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "path"
+          name: "photoId"
+          description: "ID photo yang akan di update"
+          required: true
+          type: "integer"
+          format: "uint"
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/PhotoCreateAndUpdate"
+      responses:
+        "200":
+          description: "OK"
+          schema: 
+            $ref: "#/definitions/PhotoUpdateResponse"
+      security:
+      - Bearer: []
+    delete:
+      tags:
+      - "photo"
+      summary: "Delete Photo"
+      description: "Endpoint ini digunakan untuk menghapus photo."
+      operationId: "deletePhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "path"
+          name: "photoId"
+          description: "ID photo yang akan di delete"
+          required: true
+          type: "integer"
+          format: "uint"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your photo has been successfully deleted"
+      security:
+      - Bearer: []
+
+  /comments:
+    post:
+      tags:
+      - "comment"
+      summary: "Create Comment"
+      description: "Endpoint ini digunakan untuk membuat komentar pada sebuah foto."
+      operationId: "createComment"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/CommentCreate"
+          required: true
+      responses:
+        "201":
+          description: "Created"
+          schema: 
+            $ref: "#/definitions/CommentCreateResponse"
+      security:
+      - Bearer: []
+    get:
+      tags:
+      - "comment"
+      summary: "Get Photo List"
+      description: "Endpoint ini digunakan untuk mendapatkan list photo."
+      operationId: "listPhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/CommentListResponse"
+      security:
+      - Bearer: []
+  /comments/{commentId}:
+    put:
+      tags:
+      - "comment"
+      summary: "Update Photo"
+      description: "Endpoint ini digunakan untuk update comment."
+      operationId: "updatePhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "path"
+          name: "commentId"
+          description: "ID comment yang akan di update"
+          required: true
+          type: "integer"
+          format: "uint"
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/CommentUpdate"
+      responses:
+        "200":
+          description: "OK"
+          schema: 
+            $ref: "#/definitions/CommentUpdateResponse"
+      security:
+      - Bearer: []
+    delete:
+      tags:
+      - "comment"
+      summary: "Delete Photo"
+      description: "Endpoint ini digunakan untuk menghapus comment."
+      operationId: "deletePhoto"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "path"
+          name: "commentId"
+          description: "ID comment yang akan di delete"
+          required: true
+          type: "integer"
+          format: "uint"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your comment has been successfully deleted"
+      security:
+      - Bearer: []
+
+  /socialmedias:
+    post:
+      tags:
+      - "social media"
+      summary: "Create User Social Media"
+      description: "Endpoint ini digunakan untuk menambahkan social media"
+      operationId: "createSocialMedia"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/SocialMediaCreateAndUpdate"
+          required: true
+      responses:
+        "201":
+          description: "Created"
+          schema: 
+            $ref: "#/definitions/SocialMediaCreateResponse"
+      security:
+      - Bearer: []
+    get:
+      tags:
+      - "social media"
+      summary: "Get Social Media List"
+      description: "Endpoint ini digunakan untuk mendapatkan list social media."
+      operationId: "listSocialMedia"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/SocialMediaListResponse"
+      security:
+      - Bearer: []
+  /socialmedias/{socialMediaId}:
+    put:
+      tags:
+      - "social media"
+      summary: "Update Social Media"
+      description: "Endpoint ini digunakan untuk update social media."
+      operationId: "updateSocialMedia"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "path"
+          name: "socialMediaId"
+          description: "ID social media yang akan di update"
+          required: true
+          type: "integer"
+          format: "uint"
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/SocialMediaCreateAndUpdate"
+      responses:
+        "200":
+          description: "OK"
+          schema: 
+            $ref: "#/definitions/SocialMediaUpdateResponse"
+      security:
+      - Bearer: []
+    delete:
+      tags:
+      - "social media"
+      summary: "Delete Social Media"
+      description: "Endpoint ini digunakan untuk menghapus social media."
+      operationId: "deleteSocialMedia"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "header"
+          name: "Authorization Bearer"
+          type: "string"
+          description: "Masukan Bearer Token yang diterima pada saat login"
+          required: true
+        - in: "path"
+          name: "socialMediaId"
+          description: "ID social media yang akan di delete"
+          required: true
+          type: "integer"
+          format: "uint"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+                example: "Your social media has been successfully deleted"
+      security:
+      - Bearer: []
+
+securityDefinitions:
+  Bearer:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+
+
+
+definitions:
+  User:
+    type: "object"
+    properties: 
+      id: 
+        type: "integer"
+        format: "uint"
+      username:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      age:
+        type: "integer"
+      created_at:
+        type: "string"
+        example: "Date"
+      updated_at:
+        type: "string"
+        example: "Date"
+  Photo:
+    type: "object"
+    properties: 
+      id: 
+        type: "integer"
+        format: "uint"
+      title:
+        type: "string"
+      caption:
+        type: "string"
+      photo_url:
+        type: "string"
+      user_id:
+        type: "integer"
+        format: "uint"
+      created_at:
+        type: "string"
+        example: "Date"
+      updated_at:
+        type: "string"
+        example: "Date"
+  Comment:
+    type: "object"
+    properties: 
+      id: 
+        type: "integer"
+        format: "uint"
+      user_id:
+        type: "integer"
+        format: "uint"
+      photo_id:
+        type: "integer"
+        format: "uint"
+      message:
+        type: "string"
+      created_at:
+        type: "string"
+        example: "Date"
+      updated_at:
+        type: "string"
+        example: "Date"
+  SocialMedia:
+    type: "object"
+    properties: 
+      id: 
+        type: "integer"
+        format: "uint"
+      name:
+        type: "string"
+      social_media_url:
+        type: "string"
+      user_id:
+        type: "integer"
+        format: "uint"
+      created_at:
+        type: "string"
+        example: "Date"
+      updated_at:
+        type: "string"
+        example: "Date"
+
+
+
+  UserLogin:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+        description: "Pengecekan Password dilakukan dengan package Bcrypt"
+  TokenResponse:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        example: "jwt string"
+
+  UserRegister:
+    type: "object"
+    properties:
+      age:
+        type: "integer"
+      email:
+        type: "string"
+      password:
+        type: "string"
+        description: "Password harus di hash dengan package Bcrypt"
+      username:
+        type: "string"
+  UserRegisterResponse:
+    type: "object"
+    properties:
+      age:
+        type: "integer"
+      email:
+        type: "string"
+      id:
+        type: "integer"
+      username:
+        type: "string"
+
+  UserUpdate:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      username:
+        type: "string"
+  UserUpdateResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      email:
+        type: "string"
+      username:
+        type: "string"
+      age:
+        type: "integer"
+      updated_at:
+        type: "string"
+        example: "date"
+
+  PhotoListResponse:
+    type: "array"
+    items: 
+      $ref: "#/definitions/Photo"
+      properties: 
+        User:
+          type: "object"
+          $ref: "#/definitions/UserUpdate"
+
+  PhotoCreateAndUpdate:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      caption:
+        type: "string"
+      photo_url:
+        type: "string"
+  PhotoCreateResponse:
+    allOf:
+    - type: object
+      properties:
+        id:
+          type: "integer"
+    - $ref: "#/definitions/PhotoCreateAndUpdate"
+    - type: object
+      properties:
+        user_id:
+          type: "integer"
+        created_at:
+          type: "string"
+          example: "Date"
+  PhotoUpdateResponse:
+    allOf:
+    - type: object
+      properties:
+        id:
+          type: "integer"
+    - $ref: "#/definitions/PhotoCreateAndUpdate"
+    - type: object
+      properties:
+        user_id:
+          type: "integer"
+        updated_at:
+          type: "string"
+          example: "Date"
+
+  CommentCreate:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+      photo_id:
+        type: "integer"
+  CommentCreateResponse:
+    allOf:
+    - type: object
+      properties:
+        id:
+          type: "integer"
+    - $ref: "#/definitions/CommentCreate"
+    - type: object
+      properties:
+        user_id:
+          type: "integer"
+        created_at:
+          type: "string"
+          example: "Date"
+
+  CommentUpdate:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+  CommentUpdateResponse:
+    allOf:
+    - type: object
+      properties:
+        id:
+          type: "integer"
+    - $ref: "#/definitions/CommentCreate"
+    - type: object
+      properties:
+        user_id:
+          type: "integer"
+        updated_at:
+          type: "string"
+          example: "Date"
+
+  CommentListResponse:
+    type: "array"
+    items: 
+      properties: 
+        id:
+          type: "integer"
+        message:
+          type: "string"
+        photo_id:
+          type: "integer"
+        user_id:
+          type: "integer"
+        updated_at:
+          type: "string"
+          example: "Date"
+        created_at:
+          type: "string"
+          example: "Date"
+        User:
+          type: "object"
+          properties: 
+            id:
+              type: "integer"
+            email:
+              type: "string"
+            username:
+              type: "string"
+        Photo:
+          type: "object"
+          properties: 
+            id:
+              type: "integer"
+            title:
+              type: "string"
+            caption:
+              type: "string"
+            photo_url:
+              type: "string"
+            user_id:
+              type: "integer"
+
+  SocialMediaCreateAndUpdate:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      social_media_url:
+        type: "string"
+  SocialMediaCreateResponse:
+    allOf:
+    - type: object
+      properties:
+        id:
+          type: "integer"
+    - $ref: "#/definitions/SocialMediaCreateAndUpdate"
+    - type: object
+      properties:
+        user_id:
+          type: "integer"
+        created_at:
+          type: "string"
+          example: "Date"
+  SocialMediaUpdateResponse:
+    allOf:
+    - type: object
+      properties:
+        id:
+          type: "integer"
+    - $ref: "#/definitions/SocialMediaCreateAndUpdate"
+    - type: object
+      properties:
+        user_id:
+          type: "integer"
+        updated_at:
+          type: "string"
+          example: "Date"
+
+  SocialMediaListResponse:
+    type: "object"
+    properties: 
+      social_medias:
+        type: "array"
+        items: 
+          properties: 
+            id:
+              type: "integer"
+            name:
+              type: "string"
+            social_media_url:
+              type: "string"
+            UserId:
+              type: "integer"
+            createdAt:
+              type: "string"
+              example: "Date"
+            updatedAt:
+              type: "string"
+              example: "Date"
+            User:
+              type: "object"
+              properties: 
+                id:
+                  type: "string"
+                username:
+                  type: "string"
